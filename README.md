@@ -37,7 +37,7 @@ Contribution
 Contributions, issues, and feature requests are welcome. Feel free to check issues page if you want to contribute.
 License
 
-[INSERT_LICENSE_HERE]
+[INSERT_LICENSE_HERE](LICENSE)
 
 Disclaimer
 This tool is provided as-is. Users are responsible for ensuring it meets their specific data protection and security requirements.
