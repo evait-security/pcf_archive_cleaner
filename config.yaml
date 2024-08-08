@@ -87,7 +87,7 @@ workflows:
 
 file_paths:
   DataBase:
-    path: configuration/database.sqlite3.backup
+    path: configuration/database.sqlite3
   Files:
     path: static/files/code
   PoC:
