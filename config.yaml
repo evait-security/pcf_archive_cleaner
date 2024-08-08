@@ -1,0 +1,94 @@
+workflows:
+  - table: Projects
+    column: id
+    where_clause: status
+    params: "0"
+    parent: ""
+  - table: Files
+    column: id
+    where_clause: project_id
+    params: ""
+    parent: Projects
+  - table: Issues
+    column: id
+    where_clause: project_id
+    params: ""
+    parent: Projects
+  - table: PoC
+    column: id
+    where_clause: issue_id
+    params: ""
+    parent: Issues
+  - table: Chats
+    column: id
+    where_clause: project_id
+    params: ""
+    parent: Projects
+  - table: Messages
+    column: id
+    where_clause: chat_id
+    params: ""
+    parent: Chats
+  - table: Credentials
+    column: id
+    where_clause: project_id
+    params: ""
+    parent: Projects
+  - table: Hosts
+    column: id
+    where_clause: project_id
+    params: ""
+    parent: Projects
+  - table: Hostnames
+    column: id
+    where_clause: host_id
+    params: ""
+    parent: Hosts
+  - table: Logs
+    column: id
+    where_clause: project
+    params: ""
+    parent: Projects
+  - table: NetworkPaths
+    column: id
+    where_clause: project_id
+    params: ""
+    parent: Projects
+  - table: Networks
+    column: id
+    where_clause: project_id
+    params: ""
+    parent: Projects
+  - table: Notes
+    column: id
+    where_clause: project_id
+    params: ""
+    parent: Projects
+  - table: Ports
+    column: id
+    where_clause: project_id
+    params: ""
+    parent: Projects
+  - table: Tasks
+    column: id
+    where_clause: project_id
+    params: ""
+    parent: Projects
+  - table: tool_sniffer_http_info
+    column: id
+    where_clause: project_id
+    params: ""
+    parent: Projects
+  - table: tool_sniffer_http_data
+    column: id
+    where_clause: sniffer_id
+    params: ""
+    parent: tool_sniffer_http_info
+
+file_paths:
+  DataBase:
+    path: configuration/database.sqlite3.backup
+  Files:
+    path: static/files/code
+  PoC:
+    path: static/files/poc
