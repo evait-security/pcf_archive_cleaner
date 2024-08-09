@@ -6,7 +6,7 @@ Key Features
 ## Install
   * [Download](https://github.com/evait-security/pcf_archive_cleaner/releases/download/linux_x64/pcf_archive_cleaner) the File
     * ```wget https://github.com/evait-security/pcf_archive_cleaner/releases/download/linux_x64/pcf_archive_cleaner ```
-  * ```chmode +x pcf_archive_cleaner```
+  * ```chmod +x pcf_archive_cleaner```
   * ```./pcf_archive_cleaner <<Path_to_PCF_Folder>>```
 ## Automated Cleaning: 
 Runs as a cron job on the server, automatically cleaning archived projects.
