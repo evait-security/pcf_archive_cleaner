@@ -18,12 +18,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-
-    - name: Install OpenSSL
+    
+    - name: Install OpenSSL and build essentials
       run: |
         apt-get update
-        apt-get install -y pkg-config libssl-dev
-
+        apt-get install -y pkg-config libssl-dev build-essentiall 
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        override: true
     - name: Build Release
       run: cargo build --release --verbose
 
