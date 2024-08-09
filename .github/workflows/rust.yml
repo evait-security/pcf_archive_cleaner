@@ -1,33 +1,45 @@
 name: Rust CI and Release
 
-on: 
-  push:
-    branches:
-      - main
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag for this release'
+        required: true
+        default: 'v0.1.0'
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build_and_release:
-
     runs-on: ubuntu-latest
-
     container: 
       image: rust:slim-bullseye
 
     steps:
     - uses: actions/checkout@v3
-    
-    - name: Install OpenSSL and build essentials
+
+    - name: Install dependencies
       run: |
         apt-get update
-        apt-get install -y pkg-config libssl-dev build-essential
+        apt-get install -y pkg-config libssl-dev build-essential libsqlite3-dev
+
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         override: true
+
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
     - name: Build Release
       run: cargo build --release --verbose
 
@@ -37,7 +49,7 @@ jobs:
         cp target/release/pcf_archive_cleaner assets/bin/linux_x64/pcf_archive_cleaner
         chmod +x assets/bin/linux_x64/pcf_archive_cleaner
 
-    - name: Create Releass
+    - name: Create Release
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
