@@ -7,6 +7,10 @@ on:
         description: 'Version tag for this release'
         required: true
         default: 'v0.1.0'
+      config_version:
+        description: 'Version tag for the config file'
+        required: true
+        default: 'config-v0.1.0'
 
 env:
   CARGO_TERM_COLOR: always
@@ -43,25 +47,43 @@ jobs:
     - name: Build Release
       run: cargo build --release --verbose
 
-    - name: Prepare Release Asset
+    - name: Prepare Release Assets
       run: |
         mkdir -p assets/bin/linux_x64
         cp target/release/pcf_archive_cleaner assets/bin/linux_x64/pcf_archive_cleaner
         chmod +x assets/bin/linux_x64/pcf_archive_cleaner
+        cp config.yaml assets/config.yaml
 
-    - name: Create Release
+    - name: Create Executable Release
       uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: assets/bin/linux_x64/pcf_archive_cleaner
-        tag_name: linux_x64
-        name: Release Linux x64
+        tag_name: ${{ github.event.inputs.version }}
+        name: Release ${{ github.event.inputs.version }} Linux x64
         body: This is the new release of the Linux x64 pcf_archive_cleaner binary file
+        draft: false
+        prerelease: false
+
+    - name: Create Config Release
+      uses: softprops/action-gh-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: assets/config.yaml
+        tag_name: ${{ github.event.inputs.config_version }}
+        name: Config Release ${{ github.event.inputs.config_version }}
+        body: This is the new release of the config.yaml file
         draft: false
         prerelease: false
 
     - name: Clean up
       if: always()
       run: |
+        rm -rf assets
+        rm -rf target
+        cargo clean
+        rm -rf ~/.cargo/registry
+        rm -rf ~/.cargo/git
         df -h # Displays the available storage space
