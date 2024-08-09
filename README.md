@@ -15,6 +15,16 @@ Key Features
 The config file **config.yaml** will be in the same folder as the **pcf_archive_cleaner**.
 The log file **pcf_del_archive.log** will be in the same folder as the pcf_archive_cleaner and the config.yaml files are.
 
+### The cron job
+  * Open the crontab file
+    ```shell
+    crontab -e
+    ```
+  * Add the following line to run the script daily at midnight
+    ```shell
+    0 0 * * * /path/to/pcf_archive_cleaner/pcf_archive_cleaner /path/to/pcf/folder
+    ```
+
 ## Automated Cleaning: 
 Runs as a cron job on the server, automatically cleaning archived projects.
 
@@ -52,7 +62,6 @@ Customizable to fit specific organizational needs
 Always backup your PCF database before running this tool, especially when first setting it up or after making configuration changes.
 Contribution
 Contributions, issues, and feature requests are welcome. Feel free to check issues page if you want to contribute.
-License
 
 [LICENSE](LICENSE)
 
