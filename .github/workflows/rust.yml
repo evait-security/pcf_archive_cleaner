@@ -64,9 +64,4 @@ jobs:
     - name: Clean up
       if: always()
       run: |
-        rm -rf assets
-        rm -rf target
-        cargo clean
-        rm -rf ~/.cargo/registry
-        rm -rf ~/.cargo/git
         df -h # Displays the available storage space
