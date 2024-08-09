@@ -22,7 +22,7 @@ jobs:
     - name: Install OpenSSL and build essentials
       run: |
         apt-get update
-        apt-get install -y pkg-config libssl-dev build-essentiall 
+        apt-get install -y pkg-config libssl-dev build-essentials
     - name: Install Rust
       uses: actions-rs/toolchain@v1
       with:
