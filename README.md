@@ -11,7 +11,7 @@ Key Features
   * ```chmod +x pcf_archive_cleaner```
   * ```./pcf_archive_cleaner <<Path_to_PCF_Folder>>```
 
-### The log file
+### The log and config file
 The config file **config.yaml** will be in the same folder as the **pcf_archive_cleaner**.
 The log file **pcf_del_archive.log** will be in the same folder as the pcf_archive_cleaner and the config.yaml files are.
 
