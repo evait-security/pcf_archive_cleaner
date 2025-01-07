@@ -60,7 +60,6 @@ Customizable to fit specific organizational needs
 
 ## Caution
 Always backup your PCF database before running this tool, especially when first setting it up or after making configuration changes.
-Contribution
 Contributions, issues, and feature requests are welcome. Feel free to check issues page if you want to contribute.
 
 [LICENSE](LICENSE)
