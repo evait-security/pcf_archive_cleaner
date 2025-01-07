@@ -88,6 +88,7 @@ workflows:
 file_paths:
   DataBase:
     path: configuration/database.sqlite3
+    hash: 55a956d201415f44e3577887d894e2481958441352ab50d03c2ddb3216f9410f
   Files:
     path: static/files/code
   PoC:

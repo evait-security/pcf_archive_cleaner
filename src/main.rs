@@ -1,3 +1,4 @@
+use sha2::{Sha256, Digest};
 use std::collections::HashMap;
 use std::fs::{self, File};
 use std::io::Write;
@@ -6,7 +7,7 @@ use std::env;
 use std::sync::Mutex;
 use rusqlite::{Connection, Result, params};
 use serde::Deserialize;
-use log::{info, debug, error, LevelFilter, Log, Record, Metadata};
+use log::{info, debug, warn, error, LevelFilter, Log, Record, Metadata};
 use simple_logger::SimpleLogger;
 use chrono::Local;
 
@@ -28,6 +29,7 @@ struct TableColumn {
 #[derive(Deserialize)]
 struct FilePath {
     path: PathBuf,
+    hash: Option<String>,
 }
 
 struct CombinedLogger {
@@ -188,6 +190,92 @@ fn process_workflow(
     Ok(())
 }
 
+fn calculate_column_hash(name: &str, type_name: &str) -> String {
+    let mut hasher = Sha256::new();
+    let column_string = format!("{}:{}", name, type_name);
+    hasher.update(column_string.as_bytes());
+    format!("{:x}", hasher.finalize())
+}
+
+fn calculate_table_hash(table_name: &str, column_hashes: &[String]) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(table_name.as_bytes());
+    for hash in column_hashes {
+        hasher.update(hash.as_bytes());
+    }
+    format!("{:x}", hasher.finalize())
+}
+
+fn get_schema_hash(conn: &Connection) -> Result<String> {
+    debug!("Starting schema hash calculation");
+    
+    let table_query = "
+        SELECT name FROM sqlite_master 
+        WHERE type='table' 
+        AND name NOT LIKE 'sqlite_%'
+        ORDER BY name;
+    ";
+    
+    let mut stmt = conn.prepare(table_query)?;
+    let table_rows = stmt.query_map([], |row| row.get::<_, String>(0))?;
+    
+    let mut hasher = Sha256::new();
+    
+    for table_result in table_rows {
+        let table_name = table_result?;
+        debug!("Processing table: {}", table_name);
+        
+        // Get columns for the table
+        let column_query = format!(
+            "SELECT name, type FROM pragma_table_info('{}') ORDER BY cid;",
+            table_name
+        );
+        
+        let mut column_hashes = Vec::new();
+        let mut column_stmt = conn.prepare(&column_query)?;
+        let column_rows = column_stmt.query_map([], |row| {
+            Ok((
+                row.get::<_, String>(0)?, // column name
+                row.get::<_, String>(1)?  // column type
+            ))
+        })?;
+        
+        // Calculate hashes for each column
+        for column_result in column_rows {
+            let (column_name, column_type) = column_result?;
+            let column_hash = calculate_column_hash(&column_name, &column_type);
+            debug!("Column hash for {}.{}: {}", table_name, column_name, column_hash);
+            column_hashes.push(column_hash);
+        }
+        
+        // Calculate and add table hash
+        let table_hash = calculate_table_hash(&table_name, &column_hashes);
+        debug!("Table hash for {}: {}", table_name, table_hash);
+        hasher.update(table_hash.as_bytes());
+    }
+    
+    let final_hash = format!("{:x}", hasher.finalize());
+    info!("Final schema hash: {}", final_hash);
+    
+    Ok(final_hash)
+}
+
+fn validate_database_schema(conn: &Connection, expected_hash: &str) -> Result<()> {
+    let calculated_hash = get_schema_hash(conn)?;
+    
+    if calculated_hash != expected_hash {
+        error!("Database schema hash mismatch!");
+        error!("Expected:   {}", expected_hash);
+        error!("Calculated: {}", calculated_hash);
+        return Err(rusqlite::Error::InvalidParameterName(
+            String::from("Database schema does not match configuration")
+        ));
+    }
+    
+    info!("Database schema validation successful");
+    Ok(())
+}
+
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
 
@@ -215,16 +303,26 @@ fn main() -> Result<()> {
     let config: Config = serde_yaml::from_str(&config_content)
         .expect("Failed to parse config file");
 
-    let file_paths: HashMap<String, FilePath> = config.file_paths.into_iter()
+        let file_paths: HashMap<String, FilePath> = config.file_paths.into_iter()
         .map(|(key, value)| {
             let safe_path = ensure_path_within_project(&pcf_path, Path::new(&value.path));
-            (key, FilePath { path: safe_path })
+            (key, FilePath { 
+                path: safe_path,
+                hash: value.hash 
+            })
         })
         .collect();
 
     debug!("Opening database connection");
     let conn = Connection::open(&file_paths["DataBase"].path)?;
     debug!("Database connection opened successfully");
+
+    if let Some(expected_hash) = &file_paths["DataBase"].hash {
+        debug!("Validating database schema");
+        validate_database_schema(&conn, expected_hash)?;
+    } else {
+        warn!("No schema hash provided in configuration, skipping validation");
+    }
 
     process_workflows(&conn, &config.workflows, &file_paths)?;
 
