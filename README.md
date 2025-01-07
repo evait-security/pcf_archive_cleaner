@@ -6,7 +6,7 @@ Key Features
 ## Install
   * [Download](https://github.com/evait-security/pcf_archive_cleaner/releases/download/linux_x64/pcf_archive_cleaner) the File
     * ```wget https://github.com/evait-security/pcf_archive_cleaner/releases/download/linux_x64/pcf_archive_cleaner ```
-  * [Downlaod](https://github.com/evait-security/pcf_archive_cleaner/releases/tag/config-v1.5.0) the config file vor version PCF 1.5.0
+  * [Downlaod](https://github.com/evait-security/pcf_archive_cleaner/releases/tag/config-v1.5.0) the config file for version PCF 1.5.0
     * ```wget https://github.com/evait-security/pcf_archive_cleaner/releases/tag/config-v1.5.0 ```
   * ```chmod +x pcf_archive_cleaner```
   * ```./pcf_archive_cleaner <<Path_to_PCF_Folder>>```
