@@ -42,9 +42,8 @@ The PCF Archive Cleaner implements a robust database schema validation mechanism
 #### Updating the Schema Hash
 When upgrading PCF or making changes to the database structure:
 
-1. Remove the hash value from the config.yaml file
-2. Run the cleaner once - it will log the new schema hash
-3. Update the config.yaml with the new hash value
+1. Run the cleaner once - it will log the new schema hash
+2. Update the config.yaml with the new hash value
 
 This ensures safe operation across database schema updates.
 
